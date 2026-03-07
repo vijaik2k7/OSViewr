@@ -46,7 +46,11 @@ export const fetchNewsFeed = async (feedType: NewsFeedType): Promise<NewsItem[]>
                 try {
                     const d = new Date(pubDateStr);
                     timestamp = d.getTime();
-                    pubDate = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    pubDate = d.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'America/Los_Angeles'
+                    }) + ' PST';
                 } catch (e) {
                     pubDate = pubDateStr;
                 }
