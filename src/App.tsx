@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Layers, Loader2, Flame } from 'lucide-react';
 import OSViewrMap from './components/Map';
+import Ticker from './components/Ticker';
 import './index.css';
 
 export type Location = { lng: number; lat: number };
@@ -83,6 +84,8 @@ function App() {
 
   return (
     <div className="app-container">
+      <Ticker />
+
       <OSViewrMap
         activeLayer={activeLayer as "dark" | "satellite"}
         targetLocation={targetLocation}
