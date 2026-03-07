@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# 🌍 OSViewr (Open Street Viewer)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to **OSViewr**! Your floating, glowing, and slightly-addictive 3D window to planet Earth. 🚀
 
-Currently, two official plugins are available:
+Ever wanted to spin a globe and watch 22,000 satellites whiz by? Or maybe track live flights zooming over your house? How about checking out where the earth is shaking right now, or spotting active thermal anomalies (yeah, we mean *literal fires*) from space? 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+OSViewr brings all this live data together into one beautiful, glassmorphic package!
 
-## React Compiler
+## ✨ Features That Will Make You Go "Whoa"
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+🛸 **Live Satellites**: We crunch orbital mechanics in your browser 60 times a second using CelesTrak TLEs. It's like a glowing web of space traffic! 
+✈️ **Live Flights**: Hooked up to the OpenSky Network, rendering thousands of little airplane SVGs over the map.
+🌋 **Live Earthquakes**: Real-time seismic rumbles fed directly from USGS GeoJSON. The bigger the quake, the deeper the red glow.
+🔥 **NASA Wildfires**: We intercept NASA's FIRMS satellite data (via a sneaky Vite proxy) to paint active thermal dots on the globe. Yes, you can literally see where it's hot!
+🕶️ **Glassmorphic UI**: Floating, frosted-glass panels because we like our data served with *style*.
+🗺️ **MapTiler & Carto Bases**: Switch smoothly between a moody dark matter theme and high-res satellite imagery.
 
-## Expanding the ESLint configuration
+## 🛠️ How to Fire It Up
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Ready to hijack a satellite feed? (Kidding, it's public data). 
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. **Clone the repo** (You knew this one):
+   ```bash
+   git clone https://github.com/vijaik2k7/OSViewr.git
+   cd OSViewr
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+2. **Install the magic**:
+   ```bash
+   npm install
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+3. **Start the engine**:
+   ```bash
+   npm run dev
+   ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+4. Open your browser to `http://localhost:5173` and start spinning the globe! 🌎
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **React + Vite**: Because life is too short for slow builds.
+- **MapLibre GL JS**: The secret sauce keeping our 3D globe buttery smooth.
+- **satellite.js**: For all the intense math required to predict where the ISS is right now.
+- **Lucide React**: For those crisp, scalable icons.
+
+## 🤝 Contributing
+
+Found a bug? Want to track submarines next? PRs are always welcome! Feel free to open an issue or drop a pull request. Let's make this the coolest globe wrapper on the internet.
+
+---
+*Built with ❤️, ☕, and a lot of coordinates.*
