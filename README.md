@@ -49,4 +49,4 @@ Ready to hijack a satellite feed? (Kidding, it's public data).
 Found a bug? Want to track submarines next? PRs are always welcome! Feel free to open an issue or drop a pull request. Let's make this the coolest globe wrapper on the internet.
 
 ---
-*Built with ❤️, ☕, and a lot of coordinates.*
+*Vibe Coded with ❤️, ☕, and a lot of coordinates.*
