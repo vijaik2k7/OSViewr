@@ -1,0 +1,280 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+/* Base Reset & Variables */
+:root {
+  --bg-dark: #0f172a;
+  --bg-panel: rgba(15, 23, 42, 0.65);
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --accent-color: #3b82f6;
+  --accent-hover: #60a5fa;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --panel-radius: 12px;
+  --panel-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --blur-amount: 16px;
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html {
+  height: 100%;
+  width: 100%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  overflow: hidden;
+  /* App is full screen */
+}
+
+/* MapLibre Container ensures no scrolling on the body */
+#root {
+  height: 100%;
+  width: 100%;
+  position: relative;
+}
+
+/* Glassmorphism Panel Utility */
+.glass-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(var(--blur-amount));
+  -webkit-backdrop-filter: blur(var(--blur-amount));
+  border: 1px solid var(--border-color);
+  border-radius: var(--panel-radius);
+  box-shadow: var(--panel-shadow);
+  color: var(--text-primary);
+  z-index: 10;
+}
+
+/* Button Reset */
+button {
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  color: inherit;
+  transition: all var(--transition-speed) ease;
+}
+
+/* Core Layout */
+.app-container {
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.map-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* UI Overlay */
+.ui-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  /* Let clicks pass through to the map */
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-layer>* {
+  pointer-events: auto;
+  /* Re-enable clicks on actual UI elements */
+}
+
+.header.logo-panel {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.logo-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.25), rgba(168, 85, 247, 0.15));
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+h1.title {
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff, #94a3b8);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Search Bar */
+.search-container {
+  position: absolute;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  width: 400px;
+  max-width: 90vw;
+  border-radius: 999px;
+  animation: slideDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.search-icon {
+  color: var(--text-secondary);
+  height: 20px;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.search-input {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+  margin-left: 12px;
+  font-family: inherit;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Layer Controls */
+.layer-controls {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 999px;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.layer-btn {
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.layer-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.layer-btn.active {
+  background: var(--accent-color);
+  color: white;
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Status Indicator */
+.status-indicator {
+  position: absolute;
+  bottom: 24px;
+  right: 24px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulse 2s infinite;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translate(var(--translate-x, 0), -20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(var(--translate-x, 0), 0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+
+  100% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+/* Adjust search container specifically for slideDown */
+.search-container {
+  --translate-x: -50%;
+}
+
+/* Fix Maplibre controls if requested late r */
+.maplibregl-control-container .maplibregl-ctrl-bottom-right {
+  bottom: 60px;
+  right: 16px;
+}
