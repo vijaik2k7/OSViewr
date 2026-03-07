@@ -3,6 +3,7 @@ export type NewsItem = {
     title: string;
     link: string;
     pubDate: string;
+    timestamp: number;
     source: string;
 };
 
@@ -33,16 +34,18 @@ export const fetchNewsFeed = async (feedType: NewsFeedType): Promise<NewsItem[]>
         // Parse standard RSS <item> tags
         const items = Array.from(xmlDoc.querySelectorAll('item'));
 
-        return items.map((item, index) => {
+        const newsItems: NewsItem[] = items.map((item, index) => {
             const title = item.querySelector('title')?.textContent || 'Breaking News';
             const link = item.querySelector('link')?.textContent || '#';
             const pubDateStr = item.querySelector('pubDate')?.textContent || '';
 
             // Format pub date nicely if possible
             let pubDate = '';
+            let timestamp = 0;
             if (pubDateStr) {
                 try {
                     const d = new Date(pubDateStr);
+                    timestamp = d.getTime();
                     pubDate = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 } catch (e) {
                     pubDate = pubDateStr;
@@ -54,9 +57,13 @@ export const fetchNewsFeed = async (feedType: NewsFeedType): Promise<NewsItem[]>
                 title,
                 link,
                 pubDate,
+                timestamp,
                 source: config.name
             };
         });
+
+        // Sort by timestamp ascending (latest at bottom)
+        return newsItems.sort((a, b) => a.timestamp - b.timestamp);
     } catch (e) {
         console.error('RSS Fetch Error:', e);
         return [];
