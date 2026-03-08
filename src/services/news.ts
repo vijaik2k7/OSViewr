@@ -7,7 +7,7 @@ export type NewsItem = {
     source: string;
 };
 
-export type NewsFeedType = 'bbc' | 'nyt' | 'un' | 'aj' | 'guardian' | 'nasa';
+export type NewsFeedType = 'bbc' | 'nyt' | 'un' | 'aj' | 'guardian' | 'nasa' | 'hn';
 
 const FEED_CONFIGS: Record<NewsFeedType, { url: string, name: string }> = {
     bbc: { url: '/api/news/bbc/news/world/rss.xml', name: 'BBC World News' },
@@ -15,7 +15,8 @@ const FEED_CONFIGS: Record<NewsFeedType, { url: string, name: string }> = {
     un: { url: '/api/news/un/feed/subscribe/en/news/all/rss.xml', name: 'UN News Global' },
     aj: { url: '/api/news/aj/xml/rss/all.xml', name: 'Al Jazeera' },
     guardian: { url: '/api/news/guardian/world/rss', name: 'The Guardian' },
-    nasa: { url: '/api/news/nasa-breaking/news-release/feed/', name: 'NASA News' }
+    nasa: { url: '/api/news/nasa-breaking/news-release/feed/', name: 'NASA News' },
+    hn: { url: '/api/news/hn/rss', name: 'Hacker News' }
 };
 
 export const fetchNewsFeed = async (feedType: NewsFeedType): Promise<NewsItem[]> => {
@@ -46,11 +47,13 @@ export const fetchNewsFeed = async (feedType: NewsFeedType): Promise<NewsItem[]>
                 try {
                     const d = new Date(pubDateStr);
                     timestamp = d.getTime();
-                    pubDate = d.toLocaleTimeString('en-US', {
+                    const datePart = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'America/Los_Angeles' });
+                    const timePart = d.toLocaleTimeString('en-US', {
                         hour: '2-digit',
                         minute: '2-digit',
                         timeZone: 'America/Los_Angeles'
-                    }) + ' PST';
+                    });
+                    pubDate = `${datePart} ${timePart} PST`;
                 } catch (e) {
                     pubDate = pubDateStr;
                 }

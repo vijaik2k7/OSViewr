@@ -14,7 +14,8 @@ export default function Ticker() {
         { id: 'aj', label: 'Al Jazeera' },
         { id: 'guardian', label: 'The Guardian' },
         { id: 'un', label: 'UN News' },
-        { id: 'nasa', label: 'NASA' }
+        { id: 'nasa', label: 'NASA' },
+        { id: 'hn', label: 'Hacker News' }
     ];
 
     useEffect(() => {

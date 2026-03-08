@@ -41,10 +41,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/news\/nasa-breaking/, '')
       },
-      '/api/news/space': {
-        target: 'https://www.space.com',
+      '/api/news/hn': {
+        target: 'https://news.ycombinator.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/news\/space/, '')
+        rewrite: (path) => path.replace(/^\/api\/news\/hn/, '')
       }
     }
   }
