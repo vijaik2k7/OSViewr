@@ -21,6 +21,7 @@ type MapProps = {
     flightsEnabled?: boolean;
     onFlightError?: (error: string | null) => void;
     onFlightDataRefresh?: (timestamp: Date) => void;
+    onFlightClick?: (flight: any) => void;
     satellitesEnabled?: boolean;
     onSatelliteClick?: (sat: { name: string, height: number } | null) => void;
     earthquakesEnabled?: boolean;
@@ -29,7 +30,7 @@ type MapProps = {
     onWildfireClick?: (wf: WildfireFeature | null) => void;
 };
 
-export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, flightsEnabled = false, onFlightError, onFlightDataRefresh, satellitesEnabled = false, onSatelliteClick, earthquakesEnabled = false, onEarthquakeClick, wildfiresEnabled = false, onWildfireClick }: MapProps) {
+export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, flightsEnabled = false, onFlightError, onFlightDataRefresh, onFlightClick, satellitesEnabled = false, onSatelliteClick, earthquakesEnabled = false, onEarthquakeClick, wildfiresEnabled = false, onWildfireClick }: MapProps) {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<maplibregl.Map | null>(null);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -38,6 +39,17 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
     const pollingIntervalRef = useRef<number | null>(null);
     const eqPollingIntervalRef = useRef<number | null>(null);
     const wfPollingIntervalRef = useRef<number | null>(null);
+
+    // Track active layer toggles for style reloads
+    const flightsEnabledRef = useRef(flightsEnabled);
+    const satellitesEnabledRef = useRef(satellitesEnabled);
+    const earthquakesEnabledRef = useRef(earthquakesEnabled);
+    const wildfiresEnabledRef = useRef(wildfiresEnabled);
+
+    useEffect(() => { flightsEnabledRef.current = flightsEnabled; }, [flightsEnabled]);
+    useEffect(() => { satellitesEnabledRef.current = satellitesEnabled; }, [satellitesEnabled]);
+    useEffect(() => { earthquakesEnabledRef.current = earthquakesEnabled; }, [earthquakesEnabled]);
+    useEffect(() => { wildfiresEnabledRef.current = wildfiresEnabled; }, [wildfiresEnabled]);
 
     // Fetch and update global flights data
     const refreshFlights = useCallback(async () => {
@@ -80,6 +92,27 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
             if (map.getLayer('flights-layer')) {
                 map.setLayoutProperty('flights-layer', 'visibility', 'visible');
             }
+
+            // Add interaction listeners for flights
+            const handleFlightClick = (e: maplibregl.MapMouseEvent & { features?: maplibregl.MapGeoJSONFeature[] }) => {
+                if (e.features && e.features.length > 0 && onFlightClick) {
+                    onFlightClick(e.features[0]);
+                }
+            };
+            const handleFlightEnter = () => { map.getCanvas().style.cursor = 'pointer'; };
+            const handleFlightLeave = () => { map.getCanvas().style.cursor = ''; };
+
+            map.on('click', 'flights-layer', handleFlightClick);
+            map.on('mouseenter', 'flights-layer', handleFlightEnter);
+            map.on('mouseleave', 'flights-layer', handleFlightLeave);
+
+            return () => {
+                if (pollingIntervalRef.current) window.clearInterval(pollingIntervalRef.current);
+                map.off('click', 'flights-layer', handleFlightClick);
+                map.off('mouseenter', 'flights-layer', handleFlightEnter);
+                map.off('mouseleave', 'flights-layer', handleFlightLeave);
+            };
+
         } else {
             // Teardown
             if (pollingIntervalRef.current) {
@@ -90,12 +123,13 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
             if (map.getLayer('flights-layer')) {
                 map.setLayoutProperty('flights-layer', 'visibility', 'none');
             }
-        }
+            if (onFlightClick) onFlightClick(null);
 
-        return () => {
-            if (pollingIntervalRef.current) window.clearInterval(pollingIntervalRef.current);
-        };
-    }, [flightsEnabled, isLoaded, refreshFlights]);
+            return () => {
+                if (pollingIntervalRef.current) window.clearInterval(pollingIntervalRef.current);
+            };
+        }
+    }, [flightsEnabled, isLoaded, refreshFlights, onFlightClick]);
 
     // Handle Live Satellites lifecycle and animation loop
     useEffect(() => {
@@ -105,12 +139,14 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
         let animationFrameId: number;
 
         const animateSatellites = () => {
-            if (!map.getSource('satellites-source')) return;
+            // Only update data if the source currently exists (might be temporarily wiped during style reload)
+            if (map.getSource('satellites-source')) {
+                const geoJsonData = satelliteService.getSatellitePositions(new Date());
+                const source = map.getSource('satellites-source') as maplibregl.GeoJSONSource;
+                source.setData(geoJsonData);
+            }
 
-            const geoJsonData = satelliteService.getSatellitePositions(new Date());
-            const source = map.getSource('satellites-source') as maplibregl.GeoJSONSource;
-            source.setData(geoJsonData);
-
+            // Always keep the animation loop alive while the layer toggle is on
             animationFrameId = requestAnimationFrame(animateSatellites);
         };
 
@@ -309,7 +345,8 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                     'icon-rotate': ['get', 'trueTrack'],
                     'icon-rotation-alignment': 'map',
                     'icon-allow-overlap': true, // Planes often overlap
-                    'visibility': flightsEnabled ? 'visible' : 'none'
+                    'icon-ignore-placement': false, // Crucial: must be false for clickable features bounds
+                    'visibility': flightsEnabledRef.current ? 'visible' : 'none'
                 }
             });
         }
@@ -334,7 +371,7 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                     'circle-stroke-color': 'rgba(0,0,0,0)'
                 },
                 layout: {
-                    'visibility': satellitesEnabled ? 'visible' : 'none'
+                    'visibility': satellitesEnabledRef.current ? 'visible' : 'none'
                 }
             });
         }
@@ -374,7 +411,7 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                     'circle-blur': 0.2
                 },
                 layout: {
-                    'visibility': earthquakesEnabled ? 'visible' : 'none'
+                    'visibility': earthquakesEnabledRef.current ? 'visible' : 'none'
                 }
             });
         }
@@ -411,7 +448,7 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                     'circle-blur': 0.1
                 },
                 layout: {
-                    'visibility': wildfiresEnabled ? 'visible' : 'none'
+                    'visibility': wildfiresEnabledRef.current ? 'visible' : 'none'
                 }
             });
         }
