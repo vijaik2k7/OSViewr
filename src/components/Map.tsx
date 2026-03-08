@@ -45,11 +45,13 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
     const satellitesEnabledRef = useRef(satellitesEnabled);
     const earthquakesEnabledRef = useRef(earthquakesEnabled);
     const wildfiresEnabledRef = useRef(wildfiresEnabled);
+    const isLoadedRef = useRef(isLoaded);
 
     useEffect(() => { flightsEnabledRef.current = flightsEnabled; }, [flightsEnabled]);
     useEffect(() => { satellitesEnabledRef.current = satellitesEnabled; }, [satellitesEnabled]);
     useEffect(() => { earthquakesEnabledRef.current = earthquakesEnabled; }, [earthquakesEnabled]);
     useEffect(() => { wildfiresEnabledRef.current = wildfiresEnabled; }, [wildfiresEnabled]);
+    useEffect(() => { isLoadedRef.current = isLoaded; }, [isLoaded]);
 
     // Fetch and update global flights data
     const refreshFlights = useCallback(async () => {
@@ -327,6 +329,27 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
             }
         };
 
+        // Inject custom, correct India topographical borders to overwrite the default disputed Carto dashed lines
+        if (!map.getSource('india-borders')) {
+            map.addSource('india-borders', {
+                type: 'geojson',
+                data: '/india-borders.geojson'
+            });
+        }
+
+        if (!map.getLayer('india-borders-layer')) {
+            map.addLayer({
+                id: 'india-borders-layer',
+                type: 'line',
+                source: 'india-borders',
+                paint: {
+                    'line-color': 'rgba(102, 102, 102, 1)', // Matches Carto layout
+                    'line-width': 1.5,
+                    'line-opacity': 0.8
+                }
+            });
+        }
+
         if (!map.getSource('flights-source')) {
             map.addSource('flights-source', {
                 type: 'geojson',
@@ -504,7 +527,7 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                 } catch (e) { }
 
                 // Recreate layers if style changes wipes them out
-                if (isLoaded) {
+                if (isLoadedRef.current) {
                     setupLayers(mapRef.current);
                 }
             }
