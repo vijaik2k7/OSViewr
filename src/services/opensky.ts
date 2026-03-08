@@ -44,8 +44,21 @@ export interface FlightResponse {
     timestamp?: Date;
 }
 
+// Cache mechanism: Keep anonymous API requests <= 360/day
+let cachedFlights: FlightResponse | null = null;
+let lastFetchTime = 0;
+const CACHE_DURATION_MS = 240000; // 4 minutes
+
 export const fetchGlobalFlights = async (): Promise<FlightResponse> => {
     try {
+        const now = Date.now();
+
+        // Return cached data if we fetched less than 4 minutes ago
+        if (cachedFlights && (now - lastFetchTime < CACHE_DURATION_MS)) {
+            console.log(`Returning cached OpenSky data. Next fetch allowed in ${Math.round((CACHE_DURATION_MS - (now - lastFetchTime)) / 1000)}s`);
+            return cachedFlights;
+        }
+
         // We restrict the bounding box to North America (approx) to save OpenSky daily credits 
         // bounding box: lamin=24.0, lomin=-125.0, lamax=50.0, lomax=-66.0
         const url = 'https://opensky-network.org/api/states/all?lamin=24.0&lomin=-125.0&lamax=50.0&lomax=-66.0';
@@ -82,13 +95,19 @@ export const fetchGlobalFlights = async (): Promise<FlightResponse> => {
                 }
             }));
 
-        return {
+        const result: FlightResponse = {
             data: {
                 type: 'FeatureCollection',
                 features
             },
             timestamp: new Date()
         };
+
+        // Update cache on successful fetch
+        cachedFlights = result;
+        lastFetchTime = Date.now();
+
+        return result;
     } catch (error) {
         console.error('Error fetching global flights:', error);
         return { data: { type: 'FeatureCollection', features: [] }, error: 'api_error' };
