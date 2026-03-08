@@ -6,6 +6,7 @@ Ever wanted to spin a globe and watch 22,000 satellites whiz by? Or maybe track 
 
 OSViewr brings all this live data together into one beautiful, glassmorphic package!
 
+![OSViewr Showcase](public/showcase.png)
 ## ✨ Features That Will Make You Go "Whoa"
 
 🛸 **Live Satellites**: We crunch orbital mechanics in your browser 60 times a second using CelesTrak TLEs. It's like a glowing web of space traffic! 
