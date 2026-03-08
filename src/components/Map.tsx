@@ -305,7 +305,7 @@ export default function OSViewrMap({ onMapLoaded, activeLayer, targetLocation, f
                 source: 'flights-source',
                 layout: {
                     'icon-image': 'plane-icon',
-                    'icon-size': 0.6,
+                    'icon-size': 0.2,
                     'icon-rotate': ['get', 'trueTrack'],
                     'icon-rotation-alignment': 'map',
                     'icon-allow-overlap': true, // Planes often overlap
