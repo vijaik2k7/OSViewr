@@ -46,8 +46,10 @@ export interface FlightResponse {
 
 export const fetchGlobalFlights = async (): Promise<FlightResponse> => {
     try {
-        // Fetch all global states without bounding box to maximize data per single request
-        const response = await fetch(`https://opensky-network.org/api/states/all`);
+        // We restrict the bounding box to North America (approx) to save OpenSky daily credits 
+        // bounding box: lamin=24.0, lomin=-125.0, lamax=50.0, lomax=-66.0
+        const url = 'https://opensky-network.org/api/states/all?lamin=24.0&lomin=-125.0&lamax=50.0&lomax=-66.0';
+        const response = await fetch(url);
         if (!response.ok) {
             if (response.status === 429) {
                 console.warn('OpenSky API rate limit reached.');
